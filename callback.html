@@ -1,75 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Snapchat OAuth Callback</title>
+    <title>TikTok OAuth Callback</title>
     <meta charset="UTF-8">
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-               max-width: 800px; margin: 50px auto; padding: 20px; background: #f5f5f5; }
-        .container { background: white; padding: 30px; border-radius: 8px;
-                     box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1          { color: #28a745; margin-bottom: 10px; }
-        .warning    { background: #fff3cd; border-left: 4px solid #ffc107;
-                      padding: 15px; margin: 20px 0; }
-        .code-container { background: #f4f4f4; padding: 20px; border-radius: 5px;
-                          word-break: break-all; margin: 20px 0;
-                          font-family: 'Courier New', monospace; font-size: 14px;
-                          border: 1px solid #ddd; }
-        .timer      { color: #dc3545; font-weight: bold; font-size: 18px; }
-        .copy-btn   { background: #007bff; color: white; border: none;
-                      padding: 10px 20px; border-radius: 5px;
-                      cursor: pointer; font-size: 16px; }
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 50px auto; padding: 20px; background: #f5f5f5; }
+        .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #28a745; }
+        .critical-warning { background: #dc3545; color: white; padding: 20px; border-radius: 5px; margin: 20px 0; font-weight: bold; font-size: 18px; }
+        .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; }
+        .code-container { background: #f4f4f4; padding: 20px; border-radius: 5px; word-break: break-all;
+                          margin: 20px 0; font-family: "Courier New", monospace; font-size: 14px; border: 1px solid #ddd; }
+        .timer { color: #dc3545; font-weight: bold; font-size: 24px; }
+        .copy-btn { background: #007bff; color: white; border: none; padding: 15px 30px; border-radius: 5px;
+                    cursor: pointer; font-size: 18px; font-weight: bold; }
         .copy-btn:hover { background: #0056b3; }
-        .instructions   { background: #e7f3ff; border-left: 4px solid #007bff;
-                          padding: 15px; margin: 20px 0; }
+        .instructions { background: #e7f3ff; border-left: 4px solid #007bff; padding: 15px; margin: 20px 0; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>✅ Authorization Successful!</h1>
-        <div class="warning">
-            ⚠️ <strong>Important:</strong> This code expires in
-            <span class="timer" id="timer">60</span> seconds!
+        <h1>&#x2705; TikTok Authorization Successful!</h1>
+        <div class="critical-warning">
+            &#x26A0;&#xFE0F; CRITICAL: auth_code expires in <span class="timer" id="timer">600</span> seconds (10 min)!
         </div>
-        <p><strong>Copy the authorization code below:</strong></p>
-        <div class="code-container" id="code">Loading...</div>
-        <button class="copy-btn" onclick="copyCode()">📋 Copy Code</button>
-        <div class="instructions">
-            <h3>Next Steps:</h3>
-            <ol>
-                <li>Copy the code above (click the button)</li>
-                <li>Open terminal or Postman</li>
-                <li>Exchange this code for access tokens within 60 seconds</li>
-            </ol>
-        </div>
-        <div class="warning">
-            <strong>⚠️ For Production:</strong> Replace this GitHub Pages callback
-            with a proper backend endpoint.
-        </div>
+        <div class="warning"><strong>&#x26A0;&#xFE0F; Important:</strong> TikTok uses <code>auth_code</code> (NOT <code>code</code>)!</div>
+        <div class="label">Authorization Code (auth_code):</div>
+        <div class="code-container" id="authCode">Loading...</div>
+        <button class="copy-btn" onclick="copyAuthCode()">&#x1F4CB; Copy auth_code</button>
     </div>
     <script>
-        const urlParams   = new URLSearchParams(window.location.search);
-        const code        = urlParams.get('code');
-        const codeElement = document.getElementById('code');
-        if (code) {
-            codeElement.textContent = code;
-            let timeLeft = 60;
-            const timerEl = document.getElementById('timer');
-            const countdown = setInterval(() => {
-                timeLeft--;
-                timerEl.textContent = timeLeft;
-                if (timeLeft <= 0) {
-                    clearInterval(countdown);
-                    timerEl.textContent = 'EXPIRED';
-                }
+        const urlParams = new URLSearchParams(window.location.search);
+        const authCode = urlParams.get("auth_code");
+        const authCodeEl = document.getElementById("authCode");
+        if (authCode) {
+            authCodeEl.textContent = authCode;
+            let t = 600;
+            const iv = setInterval(() => {
+                t--;
+                const m = Math.floor(t/60), s = t % 60;
+                document.getElementById("timer").textContent = `${m}:${s.toString().padStart(2,"0")}`;
+                if (t <= 0) { clearInterval(iv); document.getElementById("timer").textContent = "EXPIRED"; }
             }, 1000);
-        } else {
-            codeElement.textContent = '❌ No authorization code found in URL';
-        }
-        function copyCode() {
-            navigator.clipboard.writeText(document.getElementById('code').textContent)
-                .then(() => alert('✅ Code copied to clipboard!'))
-                .catch(() => alert('❌ Failed to copy. Select and copy manually.'));
+        } else { authCodeEl.textContent = "No auth_code found in URL"; }
+        function copyAuthCode() {
+            navigator.clipboard.writeText(document.getElementById("authCode").textContent)
+                .then(() => alert("auth_code copied! Exchange it in Postman NOW!"));
         }
     </script>
 </body>
